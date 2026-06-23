@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-neutral-950 text-neutral-100;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+  }
+
+  /* Subtle background gradient */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 400px;
+    background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(239, 68, 68, 0.06), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  code,
+  pre {
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    letter-spacing: 0;
+  }
+
+  /* Visible focus indicators for keyboard navigation */
+  *:focus-visible {
+    outline: 2px solid #F87171;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Remove focus outline for mouse clicks */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+@layer components {
+  /* Section label with consistent uppercase styling */
+  .section-label {
+    @apply text-xs font-semibold text-neutral-500 uppercase tracking-wider;
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .card-hover:hover {
+    @apply shadow-card-hover -translate-y-0.5;
+  }
+}
+
+/* Custom scrollbar for code blocks */
+pre::-webkit-scrollbar {
+  height: 6px;
+}
+
+pre::-webkit-scrollbar-track {
+  background: #171717;
+}
+
+pre::-webkit-scrollbar-thumb {
+  background: #404040;
+  border-radius: 3px;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+  background: #525252;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(239, 68, 68, 0.25);
+  color: #fff;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
