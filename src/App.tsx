@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { FrameworkSelector } from './components/FrameworkSelector';
 import { ControlCard } from './components/ControlCard';
 import { CoverageScore } from './components/CoverageScore';
 import { EvidenceExport } from './components/EvidenceExport';
 import { useComplianceStack } from './hooks/useComplianceStack';
 import { getFramework } from './data/complianceRegistry';
+import type { FrameworkId } from './types';
 
 function trackEvent(event: string, props?: Record<string, unknown>): void {
   if (typeof window !== 'undefined' && window.aif?.track) {
@@ -12,13 +13,31 @@ function trackEvent(event: string, props?: Record<string, unknown>): void {
   }
 }
 
+const FRAMEWORK_FLAGS: Record<FrameworkId, string> = {
+  soc2: '--framework=soc2',
+  hipaa: '--framework=hipaa',
+  gdpr: '--framework=gdpr',
+};
+
 export default function App() {
   const stack = useComplianceStack();
   const framework = getFramework(stack.frameworkId);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     trackEvent('page_view', { path: window.location.pathname });
   }, []);
+
+  const initCommand = `npx compstack init ${FRAMEWORK_FLAGS[stack.frameworkId]}`;
+
+  const handleCopyInit = useCallback(() => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(initCommand).catch(() => {});
+    }
+    setCopied(true);
+    trackEvent('install_command_copied', { command: initCommand });
+    setTimeout(() => setCopied(false), 2000);
+  }, [initCommand]);
 
   return (
     <div className="min-h-screen bg-neutral-950 relative">
@@ -30,28 +49,53 @@ export default function App() {
               <span className="text-white text-xs font-bold font-mono">CS</span>
             </div>
             <span className="font-semibold text-sm tracking-tight">CompStack</span>
+            <span className="text-neutral-600 text-xs font-mono ml-1">v0.1.0</span>
           </div>
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-medium text-neutral-400 hover:text-brand-400 transition-colors px-3 py-2 -mr-2 rounded-md hover:bg-neutral-800/50"
-          >
-            Docs
-          </a>
+          <span className="text-xs font-mono text-neutral-600">
+            $50K consulting → 60 seconds
+          </span>
         </div>
       </header>
 
       {/* Hero / Main builder */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10 relative z-10">
-        {/* H1 + tagline */}
+        {/* README-style hero: install command first */}
         <div className="mb-8 animate-fade-in">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-50 mb-2">
-            Compliance Stack Builder
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-50 mb-2 font-mono">
+            CompStack
           </h1>
-          <p className="text-sm sm:text-base text-neutral-400 max-w-2xl leading-relaxed">
-            Pick a framework, toggle controls, and export audit-ready evidence. Real npm packages mapped to SOC 2, HIPAA, and GDPR requirements.
+          <p className="text-sm sm:text-base text-neutral-400 max-w-2xl leading-relaxed mb-4">
+            SOC 2, HIPAA, and GDPR compliance controls as installable npm packages. No consultants, no 6-month engagements.
           </p>
+
+          {/* Copyable install command — the hero CTA */}
+          <div className="flex items-center gap-2 max-w-xl">
+            <div className="flex-1 flex items-center gap-1 font-mono text-sm px-3 py-2.5 rounded-lg bg-neutral-900 border border-neutral-800 overflow-x-auto">
+              <span className="text-neutral-600 select-none">$</span>
+              <code className="text-brand-400 whitespace-nowrap" data-testid="init-command">
+                {initCommand}
+              </code>
+            </div>
+            <button
+              type="button"
+              aria-label="Copy install command"
+              onClick={handleCopyInit}
+              className="shrink-0 px-3 py-2.5 rounded-lg text-sm font-medium bg-brand-500 text-white hover:bg-brand-600 transition-all duration-200 active:scale-95 shadow-glow-brand min-w-[72px] text-center"
+            >
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+
+          {/* Before/after contrast */}
+          <div className="flex items-center gap-3 mt-3 text-xs font-mono">
+            <span className="text-neutral-500 line-through decoration-neutral-700">
+              $50,000 audit consultant · 3–6 months
+            </span>
+            <span className="text-neutral-600">→</span>
+            <span className="text-brand-400">
+              npm install · 60 seconds · export evidence
+            </span>
+          </div>
         </div>
 
         {/* Builder layout */}
@@ -121,8 +165,8 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-neutral-800/80 px-4 sm:px-6 py-6 mt-12 relative z-10">
-        <div className="max-w-6xl mx-auto text-center text-xs text-neutral-600">
-          CompStack — Compliance controls as installable developer dependencies
+        <div className="max-w-6xl mx-auto text-center text-xs text-neutral-600 font-mono">
+          npx compstack init --framework=soc2
         </div>
       </footer>
     </div>

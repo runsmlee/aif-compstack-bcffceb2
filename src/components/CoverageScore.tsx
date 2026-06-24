@@ -50,11 +50,8 @@ export function CoverageScore({ implemented, total }: CoverageScoreProps) {
 
       {/* Big percentage */}
       <div className="flex items-baseline gap-1.5 mb-4">
-        <span className={`text-4xl font-bold ${c.text} tabular-nums tracking-tight`}>
-          {percentage}
-        </span>
-        <span className={`text-xl font-bold ${c.text}`}>
-          %
+        <span className={`text-4xl font-bold ${c.text} tabular-nums tracking-tight`} data-testid="coverage-percentage">
+          {percentage}%
         </span>
       </div>
 
